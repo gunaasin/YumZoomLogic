@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/yumzoom
+    password: guna@17
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: 'update'
+    database: postgresql
+    properties:
+      hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+client:
+  end-point: http://127.0.0.1:5501
