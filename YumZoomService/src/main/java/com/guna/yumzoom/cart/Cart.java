@@ -3,10 +3,7 @@ package com.guna.yumzoom.cart;
 import com.guna.yumzoom.cartitem.CartItem;
 import com.guna.yumzoom.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -26,5 +23,6 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<CartItem> cartItems;
 }

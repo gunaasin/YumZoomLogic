@@ -1,13 +1,11 @@
 package com.guna.yumzoom.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.guna.yumzoom.address.Address;
 import com.guna.yumzoom.order.Order;
 import com.guna.yumzoom.restaurant.Restaurant;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -56,8 +54,10 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id" , referencedColumnName = "id")
+    @ToString.Exclude
     private Address address;
 
     @OneToOne(mappedBy = "user")
+    @ToString.Exclude
     private Restaurant restaurant;
 }

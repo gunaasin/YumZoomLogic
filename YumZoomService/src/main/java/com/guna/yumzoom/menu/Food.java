@@ -2,10 +2,7 @@ package com.guna.yumzoom.menu;
 
 import com.guna.yumzoom.restaurant.Restaurant;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -41,5 +38,6 @@ public class Food {
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id" , nullable = false)
+    @ToString.Exclude
     private Restaurant restaurant;
 }

@@ -15,11 +15,11 @@ import java.util.Map;
 public class CartController {
     private final CartService cartService;
 
-    @PostMapping("/addtocart")
+    @PostMapping("/customer/addtocart")
     public ResponseEntity<?> addToCart(@RequestBody CartRequestDTO cartRequestDTO){
         try{
             cartService.addToCart(cartRequestDTO);
-            return ResponseEntity.ok().body(Map.of("message","added successfully"));
+            return ResponseEntity.ok().body(Map.of("message","Successfully added"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message","bad request"));
         }

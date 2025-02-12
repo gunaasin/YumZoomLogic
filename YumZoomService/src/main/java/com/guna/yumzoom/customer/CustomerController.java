@@ -13,7 +13,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomerController {
 
-    private OrderService orderService;
+    private final CustomerService customerService;
+    private final OrderService orderService;
+
     @PostMapping("/placeOrder")
     public ResponseEntity<?> placeOrder(
             @RequestBody OrderRequestDTO orderRequestDTO
@@ -22,7 +24,7 @@ public class CustomerController {
             orderService.placeOrder(orderRequestDTO);
             return  ResponseEntity.ok().body(Map.of("message","success"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message","sumthing when wrong"));
+            return ResponseEntity.badRequest().body(Map.of("message","Something went wrong"));
         }
     }
 
@@ -31,7 +33,22 @@ public class CustomerController {
         try{
             return  ResponseEntity.ok().body(Map.of("status",orderService.trackOrder(orderID)));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message","sumthing when wrong"));
+            return ResponseEntity.badRequest().body(Map.of("message","Something went wrong"));
+        }
+    }
+
+
+    @GetMapping("/customer/getinfo")
+    public ResponseEntity<?> getInformation(@RequestParam String token){
+        return null;
+    }
+
+    @GetMapping("/customer/getCartList")
+    public ResponseEntity<?> getCartList(@RequestParam String token){
+        try{
+            return ResponseEntity.ok().body(customerService.getCartList(token));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message","Something went wrong"));
         }
     }
 }

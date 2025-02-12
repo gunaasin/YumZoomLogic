@@ -3,10 +3,8 @@ package com.guna.yumzoom.restaurant;
 import com.guna.yumzoom.menu.Food;
 import com.guna.yumzoom.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.List;
 
 @Data
@@ -50,5 +48,6 @@ public class Restaurant {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @ToString.Exclude
     private List<Food> foodList;
 }

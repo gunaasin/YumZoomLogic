@@ -1,18 +1,15 @@
 package com.guna.yumzoom.restaurant;
 
-import com.guna.yumzoom.address.Address;
 import com.guna.yumzoom.address.AddressRepo;
 import com.guna.yumzoom.menu.*;
+import com.guna.yumzoom.security.EncryptionUtil;
 import com.guna.yumzoom.security.JwtService;
 import com.guna.yumzoom.user.Role;
 import com.guna.yumzoom.user.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,8 +38,16 @@ public class RestaurantService {
         return foodMapper.convertFoodToResponse(foodRepo.save(food));
     }
 
+
+    // this one is exception state
     public List<FoodResponseDTO> getAllFoods(String restaurantId) {
-        var resId = restaurantRepo.findByRestaurantId(restaurantId).getId();
+        String decryptedId = null;
+        try{
+             decryptedId = EncryptionUtil.decrypt(restaurantId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        var resId = restaurantRepo.findByRestaurantId(decryptedId).getId();
         List<Food> foodList =  foodRepo.findAllFoodsByRestaurantId(resId);
         Collections.shuffle(foodList);
         return foodList.stream()
@@ -114,4 +119,76 @@ public class RestaurantService {
     }
 
 
+    public List<RestaurantInformationDTO> getAllRestaurant() {
+        List<Restaurant> restaurantList =restaurantRepo.findAll();
+        Collections.shuffle(restaurantList);
+        return restaurantList.stream()
+                .map(RestaurantMapper::restaurantToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getListOfSuggestions(String keyword) {
+        List<String> results;
+        try{
+            results = foodRepo.findFoodSuggestions(keyword);
+            if (results.isEmpty()) {
+                results = restaurantRepo.findRestaurantSuggestions(keyword);
+                if(results.isEmpty()){
+                    results = restaurantRepo.findCusBasedRestaurant(keyword);
+                }
+            }
+        } catch (RuntimeException e) {
+            results = restaurantRepo.findRestaurantSuggestions(keyword);
+        }
+        return results.isEmpty() ? List.of("no suggestions") : results;
+    }
+
+    public List<?> getRelatedResponse(String keyword) {
+        List<?> result;
+        try {
+            result = foodRepo.findAllFoodsByKeyWord(keyword)
+                    .stream()
+                    .map(foodMapper::convertFoodSuggestion)
+                    .toList();
+            if(result.isEmpty()){
+                result = restaurantRepo.findRestaurantsByName(keyword)
+                        .stream()
+                        .map(RestaurantMapper::restaurantToDTO)
+                        .toList();
+                if(result.isEmpty()){
+                    result = restaurantRepo.findRestaurantByCusType(keyword)
+                            .stream()
+                            .map(RestaurantMapper::restaurantToDTO)
+                            .toList();
+                }
+            }
+        } catch (RuntimeException e) {
+            result = restaurantRepo.findRestaurantsByName(keyword);
+        }
+        return result.isEmpty() ? List.of("no suggestions") : result;
+    }
+
+    public List<String> getFoodListSuggestions(String keyword) {
+        List<String> results = null;
+        try{
+            results = foodRepo.findFoodSuggestions(keyword);
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+        }
+        return results == null ? List.of("no suggestions") : results;
+    }
+
+    public List<?> getRelatedFoodBasedOnSuggestion(String keyword){
+
+        List<FoodResponseDTO> result = null;
+        try{
+            result = foodRepo.findAllFoodsByKeyWord(keyword)
+                    .stream()
+                    .map(foodMapper::convertFoodToResponse)
+                    .toList();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return result == null ? List.of("no food item is there") : result;
+    }
 }

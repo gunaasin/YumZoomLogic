@@ -6,7 +6,10 @@ import com.guna.yumzoom.menu.UpdateFoodDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +30,6 @@ public class RestaurantController {
     @PutMapping("/restaurant/updateFoodItem")
     public ResponseEntity<?> updateFoodItem(@RequestBody UpdateFoodDTO updateFoodDTO){
         try{
-            System.out.println(updateFoodDTO);
             var res = restaurantService.updateFood(updateFoodDTO);
             return ResponseEntity.ok().body(Map.of("message",res));
         } catch (Exception e) {
@@ -55,7 +57,6 @@ public class RestaurantController {
             @RequestBody RestaurantInfoUpdateRequestDTO dto
     ){
         try{
-            System.out.println(dto +" this one is dto");
             restaurantService.updateRestaurantInfo(dto);
             return ResponseEntity.ok().body(Map.of("message","update succeed"));
         } catch (Exception e) {
@@ -68,6 +69,24 @@ public class RestaurantController {
         return ResponseEntity.ok().body(restaurantService.getInformationAboutRestaurant(token));
     }
 
+    @GetMapping("/get/eatinghouse")
+    public ResponseEntity<List<RestaurantInformationDTO>> getAllRestaurant() {
+        return ResponseEntity.ok().body(restaurantService.getAllRestaurant());
+    }
 
+    @GetMapping("/get/menus")
+    public ResponseEntity<?> getMenus(@RequestParam String restaurantId){
+        return ResponseEntity.ok().body(restaurantService.getAllFoods(restaurantId));
+    }
+
+    @GetMapping("/get/home/suggestions")
+    public ResponseEntity<?> getSuggestions(@RequestParam String keyword){
+        return ResponseEntity.ok().body(restaurantService.getListOfSuggestions(keyword));
+    }
+
+    @GetMapping("/get/resultBySuggestion")
+    public ResponseEntity<?> getResponseForSuggestion(@RequestParam String keyword){
+        return ResponseEntity.ok().body(restaurantService.getRelatedResponse(keyword));
+    }
 
 }

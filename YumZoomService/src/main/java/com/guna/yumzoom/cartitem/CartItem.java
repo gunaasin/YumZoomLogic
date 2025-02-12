@@ -3,10 +3,7 @@ package com.guna.yumzoom.cartitem;
 import com.guna.yumzoom.cart.Cart;
 import com.guna.yumzoom.menu.Food;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -20,10 +17,11 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
+    @ToString.Exclude
     private Cart cart;
 
     @ManyToOne
-    @JoinColumn(name = "food_id", nullable = false)
+    @JoinColumn(name = "food_id", nullable = false, unique = true)
     private Food food;
 
     private Integer quantity;
