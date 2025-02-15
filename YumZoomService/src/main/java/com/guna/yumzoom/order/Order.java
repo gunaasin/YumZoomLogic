@@ -4,10 +4,7 @@ import com.guna.yumzoom.orderitem.OrderItem;
 import com.guna.yumzoom.restaurant.Restaurant;
 import com.guna.yumzoom.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -28,17 +25,14 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "customer_id" , nullable = false)
+    @ToString.Exclude
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id" , nullable = false)
-    private Restaurant restaurant;
     private String orderDate;
     private int totalAmount;
-    private OrderStatus status;
+    private String status;
     private String paymentMode;
-    private String imagePath;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL , orphanRemoval = true)
+    @ToString.Exclude
     private List<OrderItem> orderItems;
 }

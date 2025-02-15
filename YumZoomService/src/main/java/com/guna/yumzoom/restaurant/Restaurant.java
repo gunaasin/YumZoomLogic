@@ -25,11 +25,6 @@ public class Restaurant {
 
     private String name;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
-//    private Address address;
-
-
     @Column(unique = true)
     private String phone;
 

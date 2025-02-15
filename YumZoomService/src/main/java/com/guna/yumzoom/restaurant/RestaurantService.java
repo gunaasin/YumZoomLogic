@@ -39,7 +39,7 @@ public class RestaurantService {
     }
 
 
-    // this one is exception state
+    // this one for users
     public List<FoodResponseDTO> getAllFoods(String restaurantId) {
         String decryptedId = null;
         try{
@@ -54,6 +54,15 @@ public class RestaurantService {
                 .map(foodMapper::convertFoodToResponse)
                 .collect(Collectors.toList());
     }
+    public List<FoodResponseDTO> getAllFoodsForRest(String restaurantId) {
+        var resId = restaurantRepo.findByRestaurantId(restaurantId).getId();
+        List<Food> foodList =  foodRepo.findAllFoodsByRestaurantId(resId);
+        Collections.shuffle(foodList);
+        return foodList.stream()
+                .map(foodMapper::convertFoodToResponse)
+                .collect(Collectors.toList());
+    }
+
 
     public void removeFoodItem(RemoveFoodItemRequest request) {
          foodRepo.deleteById(request.foodId());

@@ -49,7 +49,7 @@ public class RestaurantController {
 
     @GetMapping("/restaurant/getAllFood")
     public ResponseEntity<?> getAllFoodsByRestaurant(@RequestParam String id){
-        return ResponseEntity.ok().body(restaurantService.getAllFoods(id));
+        return ResponseEntity.ok().body(restaurantService.getAllFoodsForRest(id));
     }
 
     @PutMapping("/restaurant/updateRestaurantInfo")

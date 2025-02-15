@@ -50,14 +50,18 @@ public class User {
     private String lastLoginDate;
 
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Order> Orders;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id" , referencedColumnName = "id")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Address address;
 
     @OneToOne(mappedBy = "user")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Restaurant restaurant;
 }

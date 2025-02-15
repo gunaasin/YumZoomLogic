@@ -35,7 +35,9 @@ public class WebConfig{
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/signin",
-                                "/api/v1/signup"
+                                "/api/v1/signup",
+                                "/api/v1/stripe/webhook",
+                                "/ws/**"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

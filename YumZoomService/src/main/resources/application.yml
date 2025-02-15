@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: 'update'
+      ddl-auto: update
     database: postgresql
     properties:
       hibernate:
@@ -15,3 +15,8 @@ spring:
 
 client:
   end-point: http://127.0.0.1:5501
+
+stripe:
+  secretKey: sk_test_51QmY6sKjA1yq8LJUKUlrInhO0gqPEZ5jBzhMB8mDwJi36Hdq15PchiMvlSb1hFmAug8kR8TsywZfoNtK1dmJw5V200idxr296R
+  primaryKey: pk_test_51QmY6sKjA1yq8LJURSMgR5gAGl0o8A9pJVWw36tUm7PqlsY5SJ2l5VQmW5omn2i2j2LbR83iObBnjAPGjk43tm1v00TL9f7gff
+  webhookSecret: whsec_58d0bd00178155ef4ed9656f125c029d8fd97aa91df73056a63a5a4d348ff083
