@@ -10,6 +10,7 @@ public record OrderDTO(
     String orderId,
     String paymentMode,
     String oderDate,
+    String status,
     List<OrderItemDTO> orderItemDTOList
 ) {
 }

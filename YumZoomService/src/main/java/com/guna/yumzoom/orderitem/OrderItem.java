@@ -2,11 +2,9 @@ package com.guna.yumzoom.orderitem;
 
 import com.guna.yumzoom.menu.Food;
 import com.guna.yumzoom.order.Order;
+import com.guna.yumzoom.restaurantorder.RestaurantOrder;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -28,4 +26,5 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "order_id",nullable = false)
     private Order order;
+
 }

@@ -5,6 +5,7 @@ import com.guna.yumzoom.cartitem.CartItemRepo;
 import com.guna.yumzoom.cartitem.CartItemResponseDTO;
 import com.guna.yumzoom.menu.FoodRepo;
 import com.guna.yumzoom.orderitem.OrderItem;
+import com.guna.yumzoom.restaurantorder.RestaurantOrderService;
 import com.guna.yumzoom.security.JwtService;
 import com.guna.yumzoom.user.User;
 import com.guna.yumzoom.user.UserRepo;
@@ -29,6 +30,7 @@ public class OrderService {
     private final CartRepo cartRepo;
     private final CartItemRepo cartItemRepo;
     private final OrderWebSocketController webSocketController;
+    private final RestaurantOrderService restaurantOrderService;
 
 
     public void placeOrder(List<CartItemResponseDTO> cartItemResponseDTO , int userId , String paymentMode) {
@@ -65,10 +67,9 @@ public class OrderService {
         }
         order1.setTotalAmount(price + ((price*12)/100) + 5 + (price > 500 ? 0  : 40)) ;
         order1.setOrderItems(orderItems);
-        orderRepo.save(order1);
-
-
+        var order2 = orderRepo.save(order1);
         cartItemRepo.deleteAllCartItems(cartRepo.findByUserId(userId).getId());
+        restaurantOrderService.saveOrders(order2);
         webSocketController.sendOrderStatus(order1.getOrderId(), OrderStatus.CONFIRMED.name());
     }
 

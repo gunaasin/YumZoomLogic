@@ -25,6 +25,7 @@ public class OrderMapper {
                 .oderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
                 .paymentMode(order.getPaymentMode())
+                .status(order.getStatus())
                 .orderItemDTOList(order.getOrderItems()
                         .stream()
                         .map(OrderMapper::convertOrderListDTO)

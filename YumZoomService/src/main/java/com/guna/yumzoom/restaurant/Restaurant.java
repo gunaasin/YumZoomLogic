@@ -1,6 +1,7 @@
 package com.guna.yumzoom.restaurant;
 
 import com.guna.yumzoom.menu.Food;
+import com.guna.yumzoom.restaurantorder.RestaurantOrder;
 import com.guna.yumzoom.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,4 +46,14 @@ public class Restaurant {
     )
     @ToString.Exclude
     private List<Food> foodList;
+
+    @OneToMany(
+            mappedBy = "restaurant",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @ToString.Exclude
+    private List<RestaurantOrder> restaurantOrders;
+
+
 }

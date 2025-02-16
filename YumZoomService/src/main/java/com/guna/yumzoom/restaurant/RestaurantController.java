@@ -89,4 +89,26 @@ public class RestaurantController {
         return ResponseEntity.ok().body(restaurantService.getRelatedResponse(keyword));
     }
 
+
+//    order section
+
+
+    @GetMapping("/restaurant/get/orders")
+    public ResponseEntity<?> getOrders(@RequestParam String id){
+        return ResponseEntity.ok().body(restaurantService.getOrders(id));
+    }
+
+
+    @PutMapping("/restaurant/update/{orderId}")
+    public ResponseEntity<?> updateOrder(
+            @PathVariable String orderId,
+            @RequestBody Map<String, String> requestBody) {
+        try {
+            String status = requestBody.get("status");
+            var res =  restaurantService.updateOrder(orderId , status.toUpperCase() );
+            return ResponseEntity.ok().body(Map.of("message", res ));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.guna.yumzoom.customer;
 import com.guna.yumzoom.order.OrderService;
 import com.guna.yumzoom.payment.PaymentRequestDTO;
 import com.guna.yumzoom.payment.PaymentService;
+import com.guna.yumzoom.websocket.OrderWebSocketController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class CustomerController {
     private final CustomerService customerService;
     private final OrderService orderService;
     private final PaymentService paymentService;
+    private final OrderWebSocketController orderWebSocketController;
 
 
 
@@ -83,6 +85,12 @@ public class CustomerController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message","Enter valid One"));
         }
+    }
+
+    @GetMapping("/test-websocket/{orderId}")
+    public ResponseEntity<?> testWebSocket(@PathVariable String orderId) {
+        orderWebSocketController.sendOrderStatus(orderId, "READY");
+        return ResponseEntity.ok(List.of("WebSocket message sent to /topic/order/" + orderId));
     }
 
 

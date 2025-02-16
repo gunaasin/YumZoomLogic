@@ -2,10 +2,17 @@ package com.guna.yumzoom.restaurant;
 
 import com.guna.yumzoom.address.AddressRepo;
 import com.guna.yumzoom.menu.*;
+import com.guna.yumzoom.order.Order;
+import com.guna.yumzoom.order.OrderRepo;
+import com.guna.yumzoom.order.OrderStatus;
+import com.guna.yumzoom.restaurantorder.RestaurantOrder;
+import com.guna.yumzoom.restaurantorder.RestaurantOrderRepo;
 import com.guna.yumzoom.security.EncryptionUtil;
 import com.guna.yumzoom.security.JwtService;
 import com.guna.yumzoom.user.Role;
 import com.guna.yumzoom.user.UserRepo;
+import com.guna.yumzoom.util.Util;
+import com.guna.yumzoom.websocket.OrderWebSocketController;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,11 +26,15 @@ import java.util.stream.Collectors;
 public class RestaurantService {
 
     private final RestaurantRepo restaurantRepo;
+    private final RestaurantMapper restaurantMapper;
     private final FoodRepo foodRepo;
     private final FoodMapper foodMapper;
     private final AddressRepo addressRepo;
     private final JwtService jwtService;
     private final UserRepo userRepo;
+    private final RestaurantOrderRepo restaurantOrderRepo;
+    private final OrderRepo orderRepo;
+    private final OrderWebSocketController orderWebSocketController;
 
     public FoodResponseDTO addFood(FoodRequestDTO foodRequestDTO){
         Restaurant restaurant = restaurantRepo.findByRestaurantId(foodRequestDTO.restaurantId());
@@ -200,4 +211,33 @@ public class RestaurantService {
         }
         return result == null ? List.of("no food item is there") : result;
     }
+
+    public List<RestaurantOrderDTO> getOrders(String id) {
+        return   restaurantRepo.findByRestaurantId(id).getRestaurantOrders()
+                .stream()
+                .map(restaurantMapper::convertRestaurantOrder)
+                .toList();
+
+
+    }
+
+
+    // work on socket
+    public String updateOrder(String orderId, String status) {
+        RestaurantOrder restaurantOrder = restaurantOrderRepo.findByOrderId(orderId);
+        Order order = orderRepo.findByOrderId(orderId);
+        if(Util.isValidOrderStatus(status)){
+            restaurantOrder.setStatus(status);
+            restaurantOrderRepo.save(restaurantOrder);
+            orderWebSocketController.sendOrderStatus(orderId,status);
+            if(status.equals(OrderStatus.PREPARING.name())) order.setStatus(status);
+            else if (status.equals(OrderStatus.READY.name())) order.setStatus(OrderStatus.OUT_FOR_DELIVERY.name());
+            orderRepo.save(order);
+            return "Order Updated";
+        }else{
+            return "Invalid order status: " + status;
+        }
+    }
+
+
 }
