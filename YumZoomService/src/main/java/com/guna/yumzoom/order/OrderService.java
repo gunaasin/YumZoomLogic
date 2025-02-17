@@ -29,7 +29,6 @@ public class OrderService {
     private final JwtService jwtService;
     private final CartRepo cartRepo;
     private final CartItemRepo cartItemRepo;
-    private final OrderWebSocketController webSocketController;
     private final RestaurantOrderService restaurantOrderService;
 
 
@@ -70,7 +69,8 @@ public class OrderService {
         var order2 = orderRepo.save(order1);
         cartItemRepo.deleteAllCartItems(cartRepo.findByUserId(userId).getId());
         restaurantOrderService.saveOrders(order2);
-        webSocketController.sendOrderStatus(order1.getOrderId(), OrderStatus.CONFIRMED.name());
+
+
     }
 
     public List<OrderDTO> getOrderList(String token) {

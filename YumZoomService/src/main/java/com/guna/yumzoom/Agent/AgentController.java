@@ -1,15 +1,23 @@
 package com.guna.yumzoom.Agent;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class AgentController {
+    private final AgentService agentService;
 
-    @GetMapping("/agent/getinfo")
-    public String geeInto(){
-        return null;
+    @GetMapping("/get/agent/info")
+    public ResponseEntity<?> getInfo(@RequestParam String token){
+        return ResponseEntity.ok().body(agentService.getAgentInfo(token));
+    }
+
+    @PostMapping("/accept/order")
+    public ResponseEntity<?> acceptOrder(@RequestBody AgentOrderAcceptDTO dto){
+        System.out.println(dto);
+        return ResponseEntity.ok().body(agentService.acceptOrder(dto));
     }
 }

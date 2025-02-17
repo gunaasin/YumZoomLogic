@@ -221,8 +221,6 @@ public class RestaurantService {
 
     }
 
-
-    // work on socket
     public String updateOrder(String orderId, String status) {
         RestaurantOrder restaurantOrder = restaurantOrderRepo.findByOrderId(orderId);
         Order order = orderRepo.findByOrderId(orderId);
@@ -230,8 +228,11 @@ public class RestaurantService {
             restaurantOrder.setStatus(status);
             restaurantOrderRepo.save(restaurantOrder);
             orderWebSocketController.sendOrderStatus(orderId,status);
-            if(status.equals(OrderStatus.PREPARING.name())) order.setStatus(status);
-            else if (status.equals(OrderStatus.READY.name())) order.setStatus(OrderStatus.OUT_FOR_DELIVERY.name());
+            if(status.equals(OrderStatus.PREPARING.name())) order.setStatus(OrderStatus.PREPARING.name());
+            else if(status.equals(OrderStatus.READY.name())) {
+                order.setStatus(OrderStatus.READY_TO_SHIFT.name());
+                orderWebSocketController.sendOrdersForDeliveryAgents(orderId);
+            }
             orderRepo.save(order);
             return "Order Updated";
         }else{

@@ -5,6 +5,8 @@ import com.guna.yumzoom.order.OrderStatus;
 import com.guna.yumzoom.orderitem.OrderItem;
 import com.guna.yumzoom.restaurant.Restaurant;
 import com.guna.yumzoom.restaurant.RestaurantRepo;
+import com.guna.yumzoom.security.EncryptionUtil;
+import com.guna.yumzoom.websocket.OrderWebSocketController;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RestaurantOrderService {
 
-    private final RestaurantOrderRepo restaurantOrderRepo;
     private final RestaurantRepo restaurantRepo;
+    private final OrderWebSocketController webSocketController;
 
     @Transactional
     public void saveOrders(Order order) {
@@ -34,18 +36,13 @@ public class RestaurantOrderService {
 
         for (OrderItem item : order.getOrderItems()) {
             Integer restaurantId = item.getFood().getRestaurant().getId();
-
             // Add item to the respective restaurant's list
             restaurantOrdersMap.computeIfAbsent(restaurantId, k -> new ArrayList<>()).add(item.getFood());
         }
 
-        // Step 2: Save each restaurant's order separately
-
 
         for (Map.Entry<Integer, List<Food>> entry : restaurantOrdersMap.entrySet()) {
-
             Integer restaurantId = entry.getKey();
-
             String foodIds = entry.getValue().stream()
                     .map(food -> String.valueOf(food.getId()))
                     .reduce((a, b) -> a + ", " + b)
@@ -53,14 +50,11 @@ public class RestaurantOrderService {
 
             Restaurant restaurant = restaurantRepo.findById(restaurantId).orElseThrow();
 
-            // Step 3: Create a separate `RestaurantOrder`
             RestaurantOrder restaurantOrder = RestaurantOrder.builder()
                     .orderId(order.getOrderId())
                     .restaurant(restaurant)
                     .foodList(foodIds)
                     .time(formattedDateTime)
-////                    .orderItems(restaurantItems)
-//                    .totalAmount(restaurantItems.stream().mapToLong(OrderItem::getTotalPrice).sum())
                     .status(OrderStatus.NEW.name())
                     .build();
 
@@ -71,10 +65,9 @@ public class RestaurantOrderService {
             }
             currentOrders.add(restaurantOrder);
             restaurant.setRestaurantOrders(currentOrders);
-            restaurantRepo.save(restaurant);
-
-            // Step 4: Notify each restaurant
-//            notifyRestaurant(restaurantId, restaurantOrder);
+            Restaurant restaurant1 = restaurantRepo.save(restaurant);
+            System.out.println(restaurant1.getRestaurantId() +" this one for enc id") ;
+            webSocketController.sendOrderStatusForRestaurant(restaurant1.getRestaurantId(), OrderStatus.NEW.name());
         }
     }
 

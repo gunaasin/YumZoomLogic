@@ -1,5 +1,8 @@
 package com.guna.yumzoom.user;
 
+import com.guna.yumzoom.Agent.Agent;
+import com.guna.yumzoom.Agent.AgentRepo;
+import com.guna.yumzoom.Agent.AgentRoles;
 import com.guna.yumzoom.cart.Cart;
 import com.guna.yumzoom.cart.CartRepo;
 import com.guna.yumzoom.restaurant.Restaurant;
@@ -23,6 +26,7 @@ public class UserService {
     private final CartRepo cartRepo;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final AgentRepo agentRepo;
 
 
     public UserSignInResponseDTO saveUser(UserSignInRequestDTO userSignInRequestDTO) {
@@ -40,6 +44,12 @@ public class UserService {
                     .user(user)
                     .build();
             cartRepo.save(cart);
+        } else if (user.getRole().equals(Role.DELIVERY_AGENT)) {
+            Agent agent = agentRepo.save(new Agent());
+            agent.setAgentId(user.getId());
+            agent.setAgentEmail(user.getEmail());
+            agent.setAvailable(AgentRoles.OFFLINE.name());
+            agentRepo.save(agent);
         }
         return userMapper.convertUserToResponse(user);
     }
