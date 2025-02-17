@@ -37,7 +37,17 @@ public class WebConfig{
                                 "/api/v1/signin",
                                 "/api/v1/signup",
                                 "/api/v1/stripe/webhook",
-                                "/ws/**"
+                                "/ws/**",
+                                "/v2/api-docs",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-resources",
+                                "/swagger-resources/**",
+                                "/configuration/ui",
+                                "/configuration/security",
+                                "/swagger-ui/**",
+                                "/webjars/**",
+                                "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
