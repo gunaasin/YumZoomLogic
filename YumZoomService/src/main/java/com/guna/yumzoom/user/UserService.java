@@ -48,7 +48,7 @@ public class UserService {
             Agent agent = agentRepo.save(new Agent());
             agent.setAgentId(user.getId());
             agent.setAgentEmail(user.getEmail());
-            agent.setAvailable(AgentRoles.OFFLINE.name());
+            agent.setAvailable(AgentRoles.ONLINE.name());
             agentRepo.save(agent);
         }
         return userMapper.convertUserToResponse(user);
