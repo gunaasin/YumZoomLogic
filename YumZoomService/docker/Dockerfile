@@ -26,3 +26,4 @@ EXPOSE 8088
 
 # Run the application
 CMD ["java", "-jar", "/app/YumZoomService.jar"]
+
