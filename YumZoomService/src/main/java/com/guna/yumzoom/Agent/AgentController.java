@@ -17,7 +17,11 @@ public class AgentController {
 
     @PostMapping("/accept/order")
     public ResponseEntity<?> acceptOrder(@RequestBody AgentOrderAcceptDTO dto){
-        System.out.println(dto);
         return ResponseEntity.ok().body(agentService.acceptOrder(dto));
+    }
+
+    @PostMapping("/update/order")
+    public ResponseEntity<?> updateOrder(@RequestBody AgentOrderUpdateDTO dto){
+        return ResponseEntity.ok().body(agentService.updateOrder(dto));
     }
 }

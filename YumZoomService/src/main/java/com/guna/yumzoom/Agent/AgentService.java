@@ -1,6 +1,7 @@
 package com.guna.yumzoom.Agent;
 
 import com.guna.yumzoom.address.Address;
+import com.guna.yumzoom.agentOrders.AgentOrderRepo;
 import com.guna.yumzoom.agentOrders.AgentOrders;
 import com.guna.yumzoom.order.Order;
 import com.guna.yumzoom.order.OrderRepo;
@@ -13,10 +14,12 @@ import com.guna.yumzoom.user.User;
 import com.guna.yumzoom.user.UserRepo;
 import com.guna.yumzoom.websocket.OrderWebSocketController;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class AgentService {
     private final RestaurantOrderRepo restaurantOrderRepo;
     private final OrderWebSocketController orderWebSocketController;
     private final OrderRepo orderRepo;
+    private final AgentOrderRepo agentOrderRepo;
 
 
     public AgentInfoDTO getAgentInfo(String token){
@@ -43,14 +47,15 @@ public class AgentService {
 
     public Object acceptOrder(AgentOrderAcceptDTO dto) {
         User user = userRepo.findByEmail(jwtService.extractMailId(dto.token()));
+        User orderUser  = orderRepo.findByOrderId(dto.orderId()).getUser();
         Agent agent = agentRepo.findByAgentId(user.getId());
-        Address userAddress = user.getAddress();
-        String deliveryLocation = user.getName()+", "+userAddress.getStreet()+", "+userAddress.getCity();
+
+        Address userAddress = orderUser.getAddress();
+        String deliveryLocation = orderUser.getName()+", "+userAddress.getStreet()+", "+userAddress.getCity();
 
         RestaurantOrder restaurantOrder = restaurantOrderRepo.findByOrderId(dto.orderId());
         Address restaurantAddress = restaurantOrder.getRestaurant().getUser().getAddress();
         String pickupLocation = restaurantOrder.getRestaurant().getName()+", "+restaurantAddress.getStreet()+", "+restaurantAddress.getCity();
-
         AgentOrders agentOrders = AgentOrders.builder()
                 .agent(agent)
                 .deliveryLocation(deliveryLocation)
@@ -73,5 +78,19 @@ public class AgentService {
                 .deliveryLocation(deliveryLocation)
                 .status(agentOrders.getStatus())
                 .build();
+    }
+
+    public ResponseEntity<?> updateOrder(AgentOrderUpdateDTO dto) {
+        var order = orderRepo.findByOrderId(dto.orderId());
+        if(dto.status().equals(OrderStatus.OUT_FOR_DELIVERY.name())){
+          order.setStatus(OrderStatus.DELIVERED.name());
+          orderWebSocketController.sendOrderStatus(dto.orderId(), OrderStatus.DELIVERED.name());
+          orderRepo.save(order);
+          var agentOrder = agentOrderRepo.findByOrderId(dto.orderId());
+          agentOrder.setStatus(OrderStatus.DELIVERED.name());
+          agentOrderRepo.save(agentOrder);
+          return ResponseEntity.ok().body(Map.of("message","Order Delivered"));
+        }
+        return ResponseEntity.ok().body(Map.of("message","Server Down"));
     }
 }
